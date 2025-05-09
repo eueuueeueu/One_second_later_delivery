@@ -1,9 +1,10 @@
 import { TableProps } from 'antd';
 import React from 'react';
-
-export interface ProxyRes {
+export interface EditProxyRes {
   code: number;
   msg: string;
+}
+export interface ProxyRes extends EditProxyRes {
   data: ProxyData;
 }
 
@@ -38,6 +39,10 @@ export interface ProxyDatum {
 export interface ProxyParams {
   current: number;
   pageSize: number;
+}
+export interface EditProxyParams {
+  agentNo: string;
+  status: string;
 }
 export type TablePagination<T extends object> = NonNullable<
   Exclude<TableProps<T>['pagination'], boolean>

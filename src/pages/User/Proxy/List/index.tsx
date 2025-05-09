@@ -24,14 +24,14 @@ import timezone from 'dayjs/plugin/timezone'; // 引入 timezone 插件
 import utc from 'dayjs/plugin/utc'; // 引入 utc 插件
 import qs from 'qs';
 import { FC, useEffect, useState } from 'react';
-import { filterObject } from '../Proxy/List/hook';
-import { editAdminStatus, getAdminList, resetAdminPwd } from './api';
-import { AdminDatum, AdminDatumSearch } from './type';
+import { editProxyStatus, getProxyList, resetPwd } from './api';
+import { filterObject } from './hook';
+import { ProxyDatum, ProxyDatumSearch } from './type';
 // 初始化插件
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
-const Admin: FC = () => {
+const Proxy: FC = () => {
   // 分页配置数据
   const [pagination, setPagination] = useState({
     current: 1,
@@ -42,10 +42,10 @@ const Admin: FC = () => {
   const {
     data,
     loading,
-    run: getAdminDataList,
+    run: getProxyData,
   } = useRequest(
-    (params?: Partial<AdminDatum>) =>
-      getAdminList({
+    (params?: Partial<ProxyDatum>) =>
+      getProxyList({
         ...params,
         current: pagination.current,
         pageSize: pagination.pageSize,
@@ -61,16 +61,16 @@ const Admin: FC = () => {
     },
   );
   // 表格列配置
-  const columns: TableProps<AdminDatum>['columns'] = [
+  const columns: TableProps<ProxyDatum>['columns'] = [
     {
       title: '编号',
-      dataIndex: 'adminNo',
-      key: 'adminNo',
+      dataIndex: 'agentNo',
+      key: 'agentNo',
     },
     {
       title: '账号',
-      dataIndex: 'adminName',
-      key: 'adminName',
+      dataIndex: 'agentAccount',
+      key: 'agentAccount',
       render: (text, row) => {
         return (
           <div>
@@ -125,12 +125,18 @@ const Admin: FC = () => {
       key: 'action',
       render: (record) => {
         // 根据当前行状态动态设置按钮禁用状态
-        const [status, adminNo] = [record.status, record.adminNo];
+        const [status, agentNo, updatedBy] = [
+          record.status,
+          record.agentNo,
+          record.updatedBy,
+        ];
         const items: MenuProps['items'] = [
           {
             key: '1',
             label: (
-              <Link to={`/user/edit/edit?${qs.stringify(record)}`}>修改</Link>
+              <Link to={`/user/proxy/edit/edit?${qs.stringify(record)}`}>
+                修改
+              </Link>
             ),
           },
           {
@@ -138,36 +144,35 @@ const Admin: FC = () => {
             label: <a>启用</a>,
             disabled: status === 1, // 启用状态时禁用启用按钮
             onClick: () =>
-              editAdminStatus({
-                adminNo,
+              editProxyStatus({
+                agentNo,
                 status: status === 1 ? '0' : '1',
-              }).then(() => getAdminDataList()),
+              }).then(() => getProxyData()),
           },
           {
             key: '3',
             label: <a>禁用</a>,
             disabled: status === 0, // 禁用状态时禁用禁用按钮
             onClick: () =>
-              editAdminStatus({
-                adminNo,
+              editProxyStatus({
+                agentNo,
                 status: status === 1 ? '0' : '1',
-              }).then(() => getAdminDataList()),
+              }).then(() => getProxyData()),
           },
           {
             key: '4',
             label: <a>重置密码</a>,
-            onClick: () =>
-              resetAdminPwd({ adminNo }).then(() => getAdminDataList()),
+            onClick: () => resetPwd({ agentNo }).then(() => getProxyData()),
           },
         ];
 
         return (
           <Space size="middle">
-            <a>
+            <Link to={`/user/admins?adminNo=${updatedBy}`}>
               <Tooltip title="操作人">
                 <ContactsTwoTone className="text-[16px]" />
               </Tooltip>
-            </a>
+            </Link>
             <a>
               <Dropdown menu={{ items }}>
                 <Button
@@ -186,9 +191,9 @@ const Admin: FC = () => {
     },
   ];
   // 表格行配置
-  const rowSelection: TableProps<AdminDatum>['rowSelection'] = {
+  const rowSelection: TableProps<ProxyDatum>['rowSelection'] = {
     // 选中一行的事件
-    onChange: (selectedRowKeys: React.Key[], selectedRows: AdminDatum[]) => {
+    onChange: (selectedRowKeys: React.Key[], selectedRows: ProxyDatum[]) => {
       console.log(
         `selectedRowKeys: ${selectedRowKeys}`,
         'selectedRows: ',
@@ -205,21 +210,18 @@ const Admin: FC = () => {
     });
   };
   useEffect(() => {
-    getAdminDataList();
+    getProxyData();
   }, [pagination.current, pagination.pageSize]);
-  useEffect(() => {
-    getAdminDataList(qs.parse(location.search.slice(1)));
-  }, []);
   // 表单
   const [form] = Form.useForm();
-  const onSearch = (values: AdminDatumSearch) => {
+  const onSearch = (values: ProxyDatumSearch) => {
     // console.log('Received values:', values);
     // 过滤空值参数
-    getAdminDataList(filterObject(values));
+    getProxyData(filterObject(values));
   };
   return (
     <div className="bg-white">
-      <PageContainer title="管理员列表">
+      <PageContainer title="代理列表">
         <div className="-mx-[10px] overflow-x-auto">
           <Form
             form={form}
@@ -229,12 +231,12 @@ const Admin: FC = () => {
             <Row gutter={10}>
               <FormItemSearch
                 type="input"
-                name="adminNo"
-                placeholder="管理员编号"
+                name="agentNo"
+                placeholder="代理编号"
               />
               <FormItemSearch
                 type="input"
-                name="adminName"
+                name="agentAccount"
                 placeholder="账号"
               />
               <FormItemSearch
@@ -260,7 +262,7 @@ const Admin: FC = () => {
                     label="重置"
                     callBack={() => {
                       form.resetFields();
-                      getAdminDataList();
+                      getProxyData();
                     }}
                   />
                   <FormItemButton type="search" label="搜索" />
@@ -269,10 +271,10 @@ const Admin: FC = () => {
             </Row>
           </Form>
           <div className="w-full h-[1px] bg-[#d8d6da] mb-4"></div>
-          <AddButtonLink label="添加管理员" to="/user/edit/Add" />
-          <Table<AdminDatum>
+          <AddButtonLink label="添加代理" to="/user/proxy/edit/Add" />
+          <Table<ProxyDatum>
             rowSelection={{ type: 'checkbox', ...rowSelection }}
-            rowKey={(record) => record.adminNo}
+            rowKey={(record) => record.agentNo}
             bordered
             style={{ padding: 0 }}
             loading={loading}
@@ -294,4 +296,4 @@ const Admin: FC = () => {
     </div>
   );
 };
-export default Admin;
+export default Proxy;

@@ -56,11 +56,34 @@ export default defineConfig({
           name: '代理列表',
           path: '/user/proxy',
           component: '@/pages/User/Proxy/index',
+          routes: [
+            {
+              // 需要保留父路由的默认展示
+              path: '/user/proxy',
+              component: '@/pages/User/Proxy/List', // 代理列表组件
+            },
+            {
+              path: '/user/proxy/edit/add',
+              component: '@/pages/User/Proxy/Edit/Add.tsx',
+            },
+            {
+              path: '/user/proxy/edit/edit',
+              component: '@/pages/User/Proxy/Edit/Edit.tsx',
+            },
+          ],
         },
         {
           path: '/user/admins',
           name: '管理员列表',
           component: '@/pages/User/Admins/index',
+        },
+        {
+          path: '/user/edit/add',
+          component: '@/pages/User/Admins/Edit/Add',
+        },
+        {
+          path: '/user/edit/edit',
+          component: '@/pages/User/Admins/Edit/Edit',
         },
         {
           path: '/user/users',
