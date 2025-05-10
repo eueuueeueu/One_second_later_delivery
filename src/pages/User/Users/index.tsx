@@ -1,5 +1,6 @@
 import { FormItemButton, FormItemSearch, Status } from '@/components';
-import { EllipsisOutlined } from '@ant-design/icons';
+import { formatDateTime } from '@/hook/formatDateTime';
+import { EllipsisOutlined, RedoOutlined } from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { useRequest } from '@umijs/max';
 import {
@@ -14,16 +15,10 @@ import {
   Table,
   TableProps,
 } from 'antd';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone'; // 引入 timezone 插件
-import utc from 'dayjs/plugin/utc'; // 引入 utc 插件
 import { FC, useEffect, useState } from 'react';
 import { filterObject } from '../Proxy/List/hook';
 import { editUserStatus, getUserList } from './api';
 import { UserDatum, UserDatumSearch } from './type';
-// 初始化插件
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const User: FC = () => {
   // 分页配置数据
@@ -98,17 +93,11 @@ const User: FC = () => {
       title: '时间',
       dataIndex: 'createTime',
       key: 'createTime',
-      render: (record, row) => {
+      render: (_, row) => {
         return (
           <div className="text-[12px]">
-            <p>{`创建:${dayjs(record)
-              .utc()
-              .tz('Asia/Shanghai')
-              .format('YYYY/MM/DD HH:mm')}`}</p>
-            <p>{`更新:${dayjs(row.updateTime)
-              .utc()
-              .tz('Asia/Shanghai')
-              .format('YYYY/MM/DD HH:mm')}`}</p>
+            <p>{`创建:${formatDateTime(row.createTime)}`}</p>
+            <p>{`更新:${formatDateTime(row.updateTime)}`}</p>
           </div>
         );
       },
@@ -221,7 +210,7 @@ const User: FC = () => {
                   { value: 0, label: '禁用' },
                 ]}
               />
-              <Col span={24} className="text-left">
+              <Col span={24} className="text-left flex justify-between">
                 <Space>
                   <FormItemButton
                     type="reset"
@@ -233,6 +222,12 @@ const User: FC = () => {
                   />
                   <FormItemButton type="search" label="搜索" />
                 </Space>
+                <Button
+                  onClick={() => getUserDataList()}
+                  className="w-[40px] h-[40px]"
+                >
+                  <RedoOutlined className="text-[18px]" />
+                </Button>
               </Col>
             </Row>
           </Form>

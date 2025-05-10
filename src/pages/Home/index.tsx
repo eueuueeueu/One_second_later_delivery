@@ -26,7 +26,7 @@ const HomePage: React.FC = () => {
   //     </Button>
   //   </PageContainer>
   // );
-  return <PageContainer></PageContainer>;
+  return <PageContainer title='首页'></PageContainer>;
 };
 
 export default HomePage;

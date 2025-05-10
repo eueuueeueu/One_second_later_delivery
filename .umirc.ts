@@ -96,13 +96,12 @@ export default defineConfig({
       path: '/order',
       name: '订单管理',
       icon: 'AccountBookFilled',
-      component: '@/pages/Home/index',
-      // hideInBreadcrumb: true,
+      hideInBreadcrumb: true,
       routes: [
         {
           path: '/order/list',
           name: '订单列表',
-          component: '@/pages/Home/index',
+          component: '@/pages/Order/List/index',
         },
         {
           path: '/order/capital',

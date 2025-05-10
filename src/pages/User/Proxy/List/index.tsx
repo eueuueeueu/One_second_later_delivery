@@ -4,7 +4,12 @@ import {
   FormItemSearch,
   Status,
 } from '@/components';
-import { ContactsTwoTone, EllipsisOutlined } from '@ant-design/icons';
+import { formatDateTime } from '@/hook/formatDateTime';
+import {
+  ContactsTwoTone,
+  EllipsisOutlined,
+  RedoOutlined,
+} from '@ant-design/icons';
 import { PageContainer } from '@ant-design/pro-components';
 import { Link, useRequest } from '@umijs/max';
 import {
@@ -19,17 +24,11 @@ import {
   TableProps,
   Tooltip,
 } from 'antd';
-import dayjs from 'dayjs';
-import timezone from 'dayjs/plugin/timezone'; // 引入 timezone 插件
-import utc from 'dayjs/plugin/utc'; // 引入 utc 插件
 import qs from 'qs';
 import { FC, useEffect, useState } from 'react';
 import { editProxyStatus, getProxyList, resetPwd } from './api';
 import { filterObject } from './hook';
 import { ProxyDatum, ProxyDatumSearch } from './type';
-// 初始化插件
-dayjs.extend(utc);
-dayjs.extend(timezone);
 
 const Proxy: FC = () => {
   // 分页配置数据
@@ -105,17 +104,11 @@ const Proxy: FC = () => {
       title: '时间',
       dataIndex: 'createTime',
       key: 'createTime',
-      render: (record, row) => {
+      render: (_, row) => {
         return (
           <div className="text-[12px]">
-            <p>{`创建:${dayjs(record)
-              .utc()
-              .tz('Asia/Shanghai')
-              .format('YYYY/MM/DD HH:mm')}`}</p>
-            <p>{`更新:${dayjs(row.updateTime)
-              .utc()
-              .tz('Asia/Shanghai')
-              .format('YYYY/MM/DD HH:mm')}`}</p>
+            <p>{`创建:${formatDateTime(row.createTime)}`}</p>
+            <p>{`更新:${formatDateTime(row.updateTime)}`}</p>
           </div>
         );
       },
@@ -271,7 +264,15 @@ const Proxy: FC = () => {
             </Row>
           </Form>
           <div className="w-full h-[1px] bg-[#d8d6da] mb-4"></div>
-          <AddButtonLink label="添加代理" to="/user/proxy/edit/Add" />
+          <div className='flex justify-between mb-2'>
+            <AddButtonLink label="添加代理" to="/user/proxy/edit/Add" />
+            <Button
+              onClick={() => getProxyData()}
+              className="w-[40px] h-[40px]"
+            >
+              <RedoOutlined className="text-[18px]" />
+            </Button>
+          </div>
           <Table<ProxyDatum>
             rowSelection={{ type: 'checkbox', ...rowSelection }}
             rowKey={(record) => record.agentNo}

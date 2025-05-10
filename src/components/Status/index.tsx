@@ -1,6 +1,12 @@
 import { FC } from 'react';
 
-type StatusType = 'success' | 'error' | 'warning';
+type StatusType =
+  | 'success'
+  | 'error'
+  | 'warning'
+  | 'close'
+  | 'cancel'
+  | 'default';
 interface PropsType {
   type?: StatusType;
   label: string;
@@ -40,8 +46,11 @@ function getStyle(type: StatusType = 'success') {
     success: 'text-[#52c41a] bg-[#f6ffed] border-[#b7eb8f]',
     error: 'text-[#f5222d] bg-[#fff1f0] border-[#ffa39e]',
     warning: 'text-[#fbd115] bg-[#fffbe6] border-[#ffe58f]',
+    close: 'text-[#ffffff] bg-[#000000] border-[#060505]',
+    cancel: 'text-[#ffffff] bg-[#ababab] border-[#949090]',
+    default: 'text-[#939191] bg-[#ababab] border-[#949090]',
   };
-  return `${styleMap[type]} text-center border rounded-[4px]`;
+  return `${styleMap[type]} w-[50px] h-[25px] flex justify-center items-center text-center border rounded-[4px]`;
 }
 const Status: FC<PropsType> = (props) => {
   return <div className={getStyle(props.type)}>{props.label}</div>;
